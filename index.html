@@ -43,22 +43,22 @@
     <main class="container mx-auto p-6">
         <div id="loading" class="flex flex-col items-center justify-center py-24">
             <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-16 w-16 mb-4"></div>
-            <p class="text-uadyBlue font-semibold animate-pulse text-center">Sincronizando con la nube... <br> 
-               <span class="text-xs font-normal">Si el error persiste en Chrome, por favor usa FIREFOX.</span>
-            </p>
+            <p class="text-uadyBlue font-semibold animate-pulse text-center">Sincronizando con BDDocs_topo...</p>
         </div>
 
         <div id="sectionsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden"></div>
     </main>
 
     <script>
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTK4ARbpycnDb1tQG7SN47VfOpBaeY6jDun2N0Y9dAL8l_Dp5V6jV5xVztuTAkR1XNzWauMSzJRxjQG/pub?output=csv';
+        // URL de publicación como CSV (Asegúrate de haber publicado esta nueva hoja)
+        // Nota: Si cambiaste de archivo, debes pegar aquí el nuevo link de "Publicar en la web" como CSV
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS-V_N6uE_V_N_REPLACE_WITH_YOUR_NEW_PUB_LINK/pub?output=csv';
 
         async function loadData() {
-            // Se añade un parámetro de tiempo para evitar caché de Google
-            const finalUrl = SHEET_URL + '&t=' + new Date().getTime();
-
-            Papa.parse(finalUrl, {
+            // Intentamos cargar usando el ID de exportación directa si la publicación aún no está lista
+            const fallbackUrl = 'https://docs.google.com/spreadsheets/d/14fHdmpYwbcDKiMV8XsfrusyZhpQCFxzNt7DZfMk1EFE/gviz/tq?tqx=out:csv&sheet=Hoja%201';
+            
+            Papa.parse(fallbackUrl, {
                 download: true,
                 header: true,
                 skipEmptyLines: true,
@@ -66,11 +66,11 @@
                     if(results.data && results.data.length > 0) {
                         processData(results.data);
                     } else {
-                        showError("La hoja de cálculo parece estar vacía.");
+                        showError("La hoja parece estar vacía.");
                     }
                 },
                 error: function(err) {
-                    showError("Error de conexión local. Abre este archivo con FIREFOX para saltar las restricciones de Chrome.");
+                    showError("Error al conectar con la nueva base de datos.");
                 }
             });
         }
@@ -78,9 +78,10 @@
         function processData(data) {
             const grouped = {};
             data.forEach(row => {
-                const seccion = row['Seccion'] || row['seccion'];
-                const nombre = row['Nombre'] || row['nombre'];
-                const link = row['Link'] || row['link'];
+                // Se buscan las columnas exactas: Seccion, Nombre, Link 
+                const seccion = row['Seccion'];
+                const nombre = row['Nombre'];
+                const link = row['Link'];
 
                 if (seccion && nombre) {
                     if (!grouped[seccion]) grouped[seccion] = [];
@@ -119,5 +120,4 @@
         window.onload = loadData;
     </script>
 </body>
-
 </html>
